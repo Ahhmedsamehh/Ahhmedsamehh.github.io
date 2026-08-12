@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Ahmed Sameh — bioinformatics scientist specializing in structural prediction, immunogenicity assessment, Fc biology, translational drug development, and reproducible omics.">
@@ -251,25 +250,79 @@
       outline-style: solid;
     }
     body.editing a[data-link-id] { cursor: text; }
+    .export-dialog {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 1.25rem;
+      box-shadow: 0 24px 80px rgba(19,33,31,.25);
+      color: var(--ink);
+      max-height: calc(100vh - 2rem);
+      max-width: 42rem;
+      padding: 0;
+      width: calc(100% - 2rem);
+    }
+    .export-dialog::backdrop { background: rgba(19,33,31,.7); backdrop-filter: blur(5px); }
+    .export-dialog-inner { display: grid; gap: 1rem; padding: clamp(1.25rem, 4vw, 2rem); }
+    .export-dialog h2 { font: 500 clamp(1.8rem, 4vw, 2.7rem)/1.05 Georgia, serif; margin: 0; }
+    .export-dialog p { color: var(--muted); font-size: .82rem; margin: 0; }
+    .export-actions { display: flex; flex-wrap: wrap; gap: .55rem; }
+    .export-actions a, .export-actions button {
+      background: var(--ink);
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      color: white;
+      cursor: pointer;
+      font: 800 .72rem Arial, Helvetica, sans-serif;
+      padding: .75rem .9rem;
+      text-decoration: none;
+    }
+    .export-actions .export-primary { background: var(--green); border-color: var(--green); }
+    .export-actions .export-secondary { background: transparent; color: var(--ink); }
+    .export-source {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: .7rem;
+      color: var(--ink);
+      font: .68rem/1.45 monospace;
+      min-height: 10rem;
+      padding: .8rem;
+      resize: vertical;
+      width: 100%;
+    }
+    .export-note { background: var(--mint); border-radius: .7rem; padding: .75rem; }
     @media (max-width: 700px) {
       .editor-toolbar { bottom: .6rem; left: .6rem; max-width: none; right: .6rem; width: auto; }
       .editor-toolbar-row { flex-wrap: nowrap; overflow-x: auto; }
       .editor-toolbar button { flex: 0 0 auto; }
     }
-    @media print { .editor-toolbar { display: none !important; } }
+    @media print { .editor-toolbar, .export-dialog { display: none !important; } }
   </style>
-</head>
-<body>
+<style>html,body,#root{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;margin:0;padding:0}html,body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Helvetica Neue,Arial,sans-serif!important}button,input,textarea,select{font-family:inherit}html{background-color:transparent}html.chatgptOled.dark,html.mobileSkybridge.dark{background-color:#000}@supports (font: -apple-system-body){html.mobileSkybridge{font:-apple-system-body}}html.desktopSkybridge.dark{background-color:#1e1e1e}html.desktopSkybridge [data-openai-titlebar]{padding-left:calc(8px + var(--openai-titlebar-left-inset, 0px));padding-right:8px}html.transparentSkybridgeBackground,html.transparentSkybridgeBackground.dark{background-color:transparent}html.androidSkybridge,html.androidSkybridge body,html.androidSkybridge *{-webkit-tap-highlight-color:rgba(255,255,255,0)}html.androidSkybridge *::selection,html.androidSkybridge *::-moz-selection{background:#fff0;color:inherit}</style></head>
+<body class="">
   <aside class="editor-toolbar" aria-label="Portfolio editor">
     <div class="editor-toolbar-row">
       <button class="editor-primary" id="edit-toggle" type="button" aria-pressed="false">Edit page</button>
-      <button id="save-edits" type="button" disabled>Save</button>
+      <button id="save-edits" type="button" disabled="">Save</button>
       <button id="download-edited" type="button">Download HTML</button>
       <button class="editor-danger" id="reset-edits" type="button">Reset</button>
     </div>
-    <p class="editor-status" id="edit-status" aria-live="polite">View mode · Your original file is unchanged</p>
-    <p class="editor-help" id="editor-help" hidden>Click any outlined text to rewrite it. Double-click a link while editing to change its destination. Changes save on this device; download the HTML to keep or share them.</p>
+    <p class="editor-status" id="edit-status" aria-live="polite">View mode · Your edits are included in this file</p>
+    <p class="editor-help" id="editor-help" hidden="">Click any outlined text to rewrite it. Double-click a link while editing to change its destination. Changes save on this device; download the HTML to keep or share them.</p>
   </aside>
+  <dialog class="export-dialog" id="export-dialog">
+    <div class="export-dialog-inner">
+      <p class="eyebrow">Export fallback</p>
+      <h2>Your edited HTML is ready.</h2>
+      <p>Choose the download link below. If your preview still blocks downloads, copy the full HTML and save it as <strong>index.html</strong> using a plain-text editor.</p>
+      <div class="export-actions">
+        <a class="export-primary" id="manual-download" href="#" download="Ahmed_Sameh_Bioinformatics_Portfolio_Edited.html">Download edited file</a>
+        <button id="copy-html" type="button">Copy full HTML</button>
+        <button class="export-secondary" id="close-export" type="button">Close</button>
+      </div>
+      <p class="export-note" id="export-status" aria-live="polite">If the automatic download did not start, click “Download edited file.”</p>
+      <textarea class="export-source" id="export-source" readonly="" aria-label="Complete edited HTML source"></textarea>
+    </div>
+  </dialog>
   <a class="skip-link" href="#main">Skip to content</a>
   <header>
     <nav class="container" aria-label="Primary navigation">
@@ -299,13 +352,13 @@
         <p class="availability">Cairo, Egypt · Open to international bioinformatics roles and graduate opportunities</p>
       </div>
       <div class="hero-visual" role="img" aria-label="Molecular evidence connected to structure, immunogenicity, Fc biology, and translation">
-        <span class="visual-label">A translational bioinformatics practice</span>
+        <span class="visual-label"><br></span>
         <span class="node one"><b>01</b> Structure</span>
         <span class="node two"><b>02</b> Immunogenicity</span>
         <span class="node three"><b>03</b> Fc biology</span>
         <span class="node four"><b>04</b> Translation</span>
         <span class="visual-core"><small>Molecule</small><strong>Evidence</strong><small>Decision</small></span>
-        <span class="confidential">Method-focused examples · Confidential programs remain confidential</span>
+        <span class="confidential"><br></span>
       </div>
     </section>
 
@@ -320,7 +373,7 @@
       <div class="section-head">
         <p class="eyebrow">What I bring</p>
         <h2>Scientific breadth, anchored in a clear specialty.</h2>
-        <p>My strongest professional edge sits at the intersection of structural bioinformatics, antibody science, and translation—not only running tools, but benchmarking evidence and owning workflows.</p>
+        <p>My strongest professional edge sits at the intersection of structural bioinformatics, antibody science, and translation—not only running tools, but benchmarking evidence and owning workflows. In addition to OMICs analysis.</p>
       </div>
       <div class="expertise-grid">
         <article class="expertise-card"><span class="eyebrow">01</span><h3>Biotherapeutic structure</h3><p>Structure prediction, molecular modelling, docking, post-MD analysis, Docker-enabled workflows, and PyRosetta-assisted affinity evaluation.</p><ul class="tags"><li>Structure prediction</li><li>Molecular dynamics</li><li>PyRosetta</li><li>Docker</li></ul></article>
@@ -335,7 +388,7 @@
         <div class="section-head">
           <p class="eyebrow light">Industry role · Proteinea</p>
           <h2>Ownership across computational design and translational development.</h2>
-          <p>This is my primary professional position: a method-focused account of the workflow ownership, structural work, and translational judgement I bring to biotherapeutic development.</p>
+          <p>This is my primary professional position: a method-focused account of the pipeline ownership, structural work, and translational judgement I bring to biotherapeutic development.</p>
         </div>
         <div class="featured-role">
           <div class="role-summary"><p class="eyebrow light">May 2023 — Present</p><h3>A structure-to-translation role in biotherapeutic development.</h3><p>I connect computational evidence with candidate risk, developability, and preclinical questions while protecting confidential therapeutic programs.</p></div>
@@ -425,6 +478,12 @@
       const resetButton = document.getElementById("reset-edits");
       const status = document.getElementById("edit-status");
       const help = document.getElementById("editor-help");
+      const exportDialog = document.getElementById("export-dialog");
+      const manualDownload = document.getElementById("manual-download");
+      const copyButton = document.getElementById("copy-html");
+      const closeExport = document.getElementById("close-export");
+      const exportStatus = document.getElementById("export-status");
+      const exportSource = document.getElementById("export-source");
       const editableSelector = [
         "header .brand-copy",
         "header .nav-links a",
@@ -440,9 +499,10 @@
         "footer span"
       ].join(",");
       const editableElements = [...new Set(document.querySelectorAll(editableSelector))];
-      const editableLinks = [...document.querySelectorAll("a[href]")].filter((link) => !link.closest(".editor-toolbar"));
+      const editableLinks = [...document.querySelectorAll("a[href]")].filter((link) => !link.closest(".editor-toolbar, .export-dialog"));
       let editing = false;
       let saveTimer;
+      let exportUrl;
 
       editableElements.forEach((element, index) => {
         element.dataset.editId = `text-${index}`;
@@ -521,12 +581,12 @@
 
       document.addEventListener("click", (event) => {
         const link = event.target.closest("a[href]");
-        if (editing && link && !link.closest(".editor-toolbar")) event.preventDefault();
+        if (editing && link && !link.closest(".editor-toolbar, .export-dialog")) event.preventDefault();
       }, true);
 
       document.addEventListener("dblclick", (event) => {
         const link = event.target.closest("a[href]");
-        if (!editing || !link || link.closest(".editor-toolbar")) return;
+        if (!editing || !link || link.closest(".editor-toolbar, .export-dialog")) return;
         event.preventDefault();
         const destination = window.prompt("Edit this link destination:", link.getAttribute("href"));
         if (destination !== null && destination.trim()) {
@@ -535,11 +595,18 @@
         }
       }, true);
 
-      downloadButton.addEventListener("click", () => {
-        saveEdits("Preparing your edited HTML…");
-        const wasEditing = editing;
-        setEditing(false);
+      function buildExportSource() {
         const clone = document.documentElement.cloneNode(true);
+        clone.removeAttribute("style");
+        [...clone.attributes].forEach((attribute) => {
+          if (attribute.name.startsWith("data-oai-")) clone.removeAttribute(attribute.name);
+        });
+        clone.querySelectorAll("*").forEach((element) => {
+          [...element.attributes].forEach((attribute) => {
+            if (attribute.name.startsWith("data-oai-")) element.removeAttribute(attribute.name);
+          });
+        });
+        clone.querySelectorAll('[style*="forced-color-adjust"]').forEach((element) => element.remove());
         clone.querySelector("body").classList.remove("editing");
         clone.querySelectorAll("[contenteditable]").forEach((element) => element.removeAttribute("contenteditable"));
         clone.querySelectorAll("[data-edit-id]").forEach((element) => element.removeAttribute("data-edit-id"));
@@ -548,22 +615,66 @@
         const cloneSave = clone.querySelector("#save-edits");
         const cloneStatus = clone.querySelector("#edit-status");
         const cloneHelp = clone.querySelector("#editor-help");
+        const cloneDialog = clone.querySelector("#export-dialog");
+        const cloneSource = clone.querySelector("#export-source");
+        const cloneManualDownload = clone.querySelector("#manual-download");
         if (cloneToggle) { cloneToggle.textContent = "Edit page"; cloneToggle.setAttribute("aria-pressed", "false"); }
         if (cloneSave) cloneSave.setAttribute("disabled", "");
         if (cloneStatus) cloneStatus.textContent = "View mode · Your edits are included in this file";
         if (cloneHelp) cloneHelp.setAttribute("hidden", "");
-        const source = "<!doctype html>\n" + clone.outerHTML;
+        if (cloneDialog) cloneDialog.removeAttribute("open");
+        if (cloneSource) cloneSource.textContent = "";
+        if (cloneManualDownload) cloneManualDownload.setAttribute("href", "#");
+        return "<!doctype html>\n" + clone.outerHTML;
+      }
+
+      function prepareExport() {
+        saveEdits("Preparing your edited HTML…");
+        const source = buildExportSource();
         const blob = new Blob([source], { type: "text/html;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const download = document.createElement("a");
-        download.href = url;
-        download.download = "Ahmed_Sameh_Bioinformatics_Portfolio_Edited.html";
-        document.body.appendChild(download);
-        download.click();
-        download.remove();
-        URL.revokeObjectURL(url);
-        status.textContent = "Edited HTML downloaded";
-        if (wasEditing) setEditing(true);
+        if (exportUrl) URL.revokeObjectURL(exportUrl);
+        exportUrl = URL.createObjectURL(blob);
+        manualDownload.href = exportUrl;
+        exportSource.value = source;
+        exportStatus.textContent = "If the automatic download did not start, click “Download edited file.”";
+        if (typeof exportDialog.showModal === "function") exportDialog.showModal();
+        else exportDialog.setAttribute("open", "");
+        status.textContent = "Export ready · Use the open save panel";
+        return { source };
+      }
+
+      downloadButton.addEventListener("click", () => {
+        prepareExport();
+        manualDownload.click();
+      });
+
+      manualDownload.addEventListener("click", () => {
+        exportStatus.textContent = "Download requested. If nothing happens, use “Copy full HTML” below.";
+        status.textContent = "Download requested";
+      });
+
+      copyButton.addEventListener("click", async () => {
+        const source = exportSource.value || prepareExport().source;
+        let copied = false;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(source);
+            copied = true;
+          }
+        } catch (error) {}
+        if (!copied) {
+          exportSource.focus();
+          exportSource.select();
+          try { copied = document.execCommand("copy"); } catch (error) {}
+        }
+        exportStatus.textContent = copied
+          ? "Full HTML copied. Paste it into a plain-text file named index.html."
+          : "Automatic copying was blocked. The full HTML is selected below; press Ctrl+C (or Command+C).";
+      });
+
+      closeExport.addEventListener("click", () => {
+        if (typeof exportDialog.close === "function") exportDialog.close();
+        else exportDialog.removeAttribute("open");
       });
 
       resetButton.addEventListener("click", () => {
@@ -576,5 +687,5 @@
       restoreState();
     })();
   </script>
-</body>
-</html>
+
+</body></html>
